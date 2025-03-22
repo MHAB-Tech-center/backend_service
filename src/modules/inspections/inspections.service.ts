@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  Inject,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateInspectionDTO } from 'src/common/dtos/inspections/create-inspection.dto';
@@ -169,7 +170,7 @@ export class InspectionsService {
       this.utilService.getSummaryReportEntity(dto),
     );
     // Change the status to submitted
-    console.log(inspectionPlan)
+    console.log(inspectionPlan);
     inspectionPlan.status = EInspectionStatus[EInspectionStatus.SUBMITTED];
     inspectionPlan.summaryReport = summaryReport;
     inspectionPlan.identification = identification;
@@ -319,18 +320,19 @@ export class InspectionsService {
       inspectionPlan.id,
       inspectionPlan.summaryReport,
       inspectionPlan.minesiteInfo,
-      inspectionPlan.status
+      inspectionPlan.status,
     );
     return inspectionsResponse;
   }
-  async getAllInspectionPlans(){
-    return await this.inspectionPlanRepository.find({})
+  async getAllInspectionPlans() {
+    return await this.inspectionPlanRepository.find({});
   }
   async getAllInspectionReports(): Promise<InspectionsResponseDTO[]> {
-    const inspectionPlans: InspectionPlan[] = await this.getAllInspectionPlans();
+    const inspectionPlans: InspectionPlan[] =
+      await this.getAllInspectionPlans();
     let responseDTOs: InspectionsResponseDTO[] = [];
-    inspectionPlans.forEach(async (plan:InspectionPlan) => {
-      const inspectionPlan = await this.getInspectionPlan(plan.id)
+    inspectionPlans.forEach(async (plan: InspectionPlan) => {
+      const inspectionPlan = await this.getInspectionPlan(plan.id);
       const categoryList: Category[] = await this.categoryRepository.find({
         where: {
           inspectionPlan: { id: inspectionPlan.id },
@@ -343,11 +345,11 @@ export class InspectionsService {
         inspectionPlan.id,
         inspectionPlan.summaryReport,
         inspectionPlan.minesiteInfo,
-        inspectionPlan.status
+        inspectionPlan.status,
       );
-      responseDTOs.push(inspectionsResponse)
-    })
-    return responseDTOs;   
+      responseDTOs.push(inspectionsResponse);
+    });
+    return responseDTOs;
   }
 
   async countAllPlansByProvince(province: string): Promise<number> {
@@ -380,7 +382,7 @@ export class InspectionsService {
       inspectionPlan.id,
       inspectionPlan.summaryReport,
       inspectionPlan.minesiteInfo,
-      inspectionPlan.status
+      inspectionPlan.status,
     );
     return inspectionsResponse;
   }
@@ -473,7 +475,7 @@ export class InspectionsService {
       inspectionPlan.id,
       inspectionPlan.summaryReport,
       inspectionPlan.minesiteInfo,
-      inspectionPlan.status
+      inspectionPlan.status,
     );
     return inspectionsResponse;
   }
@@ -500,7 +502,7 @@ export class InspectionsService {
       inspectionPlan.id,
       inspectionPlan.summaryReport,
       inspectionPlan.minesiteInfo,
-      inspectionPlan.status
+      inspectionPlan.status,
     );
     return inspectionsResponse;
   }
@@ -520,24 +522,39 @@ export class InspectionsService {
     );
   }
 
-  async approveOrRejectInspectionPlan(action: string, planId: UUID) : Promise<InspectionPlan>{
-    if(!action) throw new BadRequestException("The action should not be null");
+  async approveOrRejectInspectionPlan(
+    action: string,
+    planId: UUID,
+  ): Promise<InspectionPlan> {
+    if (!action) throw new BadRequestException('The action should not be null');
     let status: EInspectionStatus;
-    switch(action.toUpperCase()){
-      case "APPROVE":
+    switch (action.toUpperCase()) {
+      case 'APPROVE':
         status = EInspectionStatus.APPROVED;
         break;
       case 'REJECT':
         status = EInspectionStatus.REJECTED;
         break;
-       default:
-        throw new BadRequestException("The provided action is not valid, it should be in [REJECT,APPROVE]") 
+      default:
+        throw new BadRequestException(
+          'The provided action is not valid, it should be in [REJECT,APPROVE]',
+        );
     }
 
     let inspectionPlan = await this.getInspectionPlan(planId);
     inspectionPlan.status = status;
-    inspectionPlan = await this.inspectionPlanRepository.save(inspectionPlan)
-    await this.mailingService.sendEmail('',action.toLowerCase(),inspectionPlan.inspectorInfo.lastName, null, null, inspectionPlan.inspectorInfo.email, `${inspectionPlan.createdAt.getDay}/${inspectionPlan.createdAt.getMonth()}/${inspectionPlan.createdAt.getFullYear()}`)
+    inspectionPlan = await this.inspectionPlanRepository.save(inspectionPlan);
+    await this.mailingService.sendEmail(
+      '',
+      action.toLowerCase(),
+      inspectionPlan.inspectorInfo.lastName,
+      null,
+      null,
+      inspectionPlan.inspectorInfo.email,
+      `${
+        inspectionPlan.createdAt.getDay
+      }/${inspectionPlan.createdAt.getMonth()}/${inspectionPlan.createdAt.getFullYear()}`,
+    );
     return inspectionPlan;
   }
 

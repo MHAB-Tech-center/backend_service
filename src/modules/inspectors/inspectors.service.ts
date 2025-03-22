@@ -61,7 +61,6 @@ export class InspectorsService {
       phonenumber,
       minesiteId,
       password,
-      inspectorRole,
       province,
       district,
     } = body;
@@ -74,7 +73,9 @@ export class InspectorsService {
         'The profile you are trying to set up is not found',
       );
 
-    let role: string = this.utilsService.getInspectorRole(inspectorRole);
+    let inspectorRoleStr: string = this.utilsService.getInspectorRole(
+      body.inspectorRole,
+    );
     const inspector: Inspector = new Inspector(
       firstName,
       lastName,
@@ -82,7 +83,7 @@ export class InspectorsService {
       new Date(),
       phonenumber,
       national_id,
-      role,
+      inspectorRoleStr,
       province,
       district,
     );
@@ -100,10 +101,10 @@ export class InspectorsService {
     }
 
     userProfile.status = EAccountStatus[EAccountStatus.ACTIVE];
-    await this.userService.saveExistingProfile(
-      userProfile,
-      userProfile.roles[0],
+    const inspectorRole = await this.roleService.getRoleByName(
+      ERole[ERole.INSPECTOR],
     );
+    await this.userService.saveExistingProfile(userProfile, inspectorRole);
     await this.inspectorRepo.save(inspector);
     return new ApiResponse(
       true,
@@ -125,9 +126,12 @@ export class InspectorsService {
       );
     }
     profile.email = dto.email;
+    const inspectorRole = await this.roleService.getRoleByName(
+      ERole[ERole.INSPECTOR],
+    );
     const updatedProfile: Profile = await this.userService.saveExistingProfile(
       profile,
-      profile.roles[0],
+      inspectorRole,
     );
     inspector.firstName = dto.firstName;
     inspector.lastName = dto.lastName;
@@ -216,15 +220,12 @@ export class InspectorsService {
     return inspector;
   }
   async delete(id: UUID) {
-    const rmbMember = await this.getById(id);
-    if (!rmbMember) {
-      throw new NotFoundException('The inspector is not found');
-    }
-    this.inspectorRepo.remove(rmbMember);
+    const inspector = await this.getById(id);
+    await this.inspectorRepo.remove(inspector);
     return new ApiResponse(
       true,
       'An inspector was deleted successfully',
-      rmbMember,
+      inspector,
     );
   }
 }

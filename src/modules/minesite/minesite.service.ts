@@ -37,13 +37,15 @@ export class MinesiteService {
     );
   }
   async update(id: UUID, dto: CreateMineSiteDTO): Promise<ApiResponse> {
-    if (!this.existsById(id))
+    if (!(await this.existsById(id)))
       throw new BadRequestException(
-        'The minesite with the provided id is not found ',
+        'The minesite with the provided id is not found',
       );
     const minesiteEntity: MineSite = await this.getById(id);
     minesiteEntity.code = dto.code;
     minesiteEntity.name = dto.name;
+    minesiteEntity.province = dto.province;
+    minesiteEntity.district = dto.district;
     const updatedMinesite = await this.minesiteRepository.save(minesiteEntity);
     return new ApiResponse(
       true,
@@ -71,22 +73,24 @@ export class MinesiteService {
     );
   }
   async findById(id: UUID) {
-    if (!this.existsById(id))
+    const minesite = await this.minesiteRepository.findOne({
+      where: { id: id },
+    });
+    if (!minesite)
       throw new NotFoundException(
         'The minesite with the provided Id is not found',
       );
-    return await this.minesiteRepository.findOne({
-      where: { id: id },
-    });
+    return minesite;
   }
   async findByCode(code: string) {
-    if (!this.existsByCode(code))
+    const minesite = await this.minesiteRepository.findOne({
+      where: { code: code },
+    });
+    if (!minesite)
       throw new NotFoundException(
         'The minesite with the provided code is not found',
       );
-    return await this.minesiteRepository.findOne({
-      where: { code: code },
-    });
+    return minesite;
   }
   async existsById(id: UUID): Promise<boolean> {
     const isAvailable = await this.minesiteRepository.findOne({

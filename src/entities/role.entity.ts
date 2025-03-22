@@ -15,7 +15,7 @@ import { Profile } from './profile.entity';
 export class Role extends InitiatorAudit {
   @PrimaryGeneratedColumn()
   id: number;
-  @Column()
+  @Column({ nullable: true })
   role_name: String;
   @ManyToMany(() => Profile)
   users: Profile[];

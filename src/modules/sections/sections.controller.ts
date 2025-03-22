@@ -37,7 +37,7 @@ export class SectionsController {
     return new ApiResponse(
       true,
       'The section was updated successfully',
-      this.sectionService.update(id, dto),
+      await this.sectionService.update(id, dto),
     );
   }
   @Patch('change-flag/:id')
@@ -49,10 +49,7 @@ export class SectionsController {
     return new ApiResponse(
       true,
       'The section was updated successfully',
-      this.sectionService.updateFlagStandard(
-        id,
-        this.updateFlagStandard(id, dto),
-      ),
+      await this.sectionService.updateFlagStandard(id, dto),
     );
   }
 
