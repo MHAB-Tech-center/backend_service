@@ -7,6 +7,7 @@ import { Category } from 'src/entities/category.entity';
 import { InspectionRecord } from 'src/entities/inspection-record.entity';
 import { InspectionIdentification } from 'src/entities/inspection-identification.entity';
 import { SummaryReport } from 'src/entities/summary-report.entity';
+import { CoordinatesModule } from '../coordinates/coordinates.module';
 
 @Global()
 @Module({
@@ -19,6 +20,7 @@ import { SummaryReport } from 'src/entities/summary-report.entity';
       InspectionIdentification,
       SummaryReport,
     ]),
+    CoordinatesModule,
   ],
   controllers: [InspectionsController],
   exports: [InspectionsService],

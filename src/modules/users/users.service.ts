@@ -76,7 +76,7 @@ export class UsersService {
         activationCode: code,
       },
       relations: ['roles'],
-    });
+    }); 
     return user;
   }
 

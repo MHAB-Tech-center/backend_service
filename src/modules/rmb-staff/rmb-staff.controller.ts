@@ -57,7 +57,7 @@ export class RmbStaffController {
   }
 
   @Get('all/by-status')
-  @Roles('ADMIN','RMB')
+  @Roles('ADMIN', 'RMB')
   @ApiQuery({ name: 'status', required: true, example: 'pending' })
   async findByStatus(@Query('status') status: string): Promise<ApiResponse> {
     return new ApiResponse(
@@ -67,7 +67,7 @@ export class RmbStaffController {
     );
   }
   @Get('all')
-  @Roles('ADMIN','RMB')
+  @Roles('ADMIN', 'RMB')
   async getAll(): Promise<ApiResponse> {
     return new ApiResponse(
       true,
@@ -77,7 +77,7 @@ export class RmbStaffController {
   }
 
   @Get('/:id')
-  @Roles('ADMIN','RMB')
+  @Roles('ADMIN', 'RMB')
   async findById(@Param('id') id: UUID): Promise<ApiResponse> {
     return new ApiResponse(
       true,
@@ -87,7 +87,7 @@ export class RmbStaffController {
   }
 
   @Get()
-  @Roles('ADMIN','RMB')
+  @Roles('ADMIN', 'RMB')
   @ApiQuery({ name: 'userId', required: true })
   async findByUser(@Query('userId') userId: any): Promise<ApiResponse> {
     return new ApiResponse(
@@ -119,7 +119,7 @@ export class RmbStaffController {
     );
   }
   @Get('roles/all')
-  @Roles('ADMIN','RMB')
+  @Roles('ADMIN', 'RMB')
   async getAllRMBRoles(): Promise<ApiResponse> {
     return new ApiResponse(
       true,

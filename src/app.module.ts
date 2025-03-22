@@ -52,12 +52,26 @@ import { SystemFeature } from './entities/system-feature.entity';
 import { FeaturesModule } from './modules/features/features.module';
 import { RmbStaffModule } from './modules/rmb-staff/rmb-staff.module';
 import { AnalyticsModule } from './modules/analytics/analytics.module';
+import { BrainModule } from './integrations/brain/brain.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
+    BrainModule.forRootAsync({
+      useFactory: async (configService: ConfigService) => ({
+        redisConfig: {
+          config: {
+            host: configService.get('REDIS_HOST'),
+            port: configService.get('REDIS_PORT'),
+            password: configService.get('REDIS_PASSWORD'),
+          },
+        },
+        appPrefix: 'dmim',
+      }),
+      inject: [ConfigService],
+    }),
     TypeOrmModule.forRootAsync({
-      imports: [ConfigModule], // Import ConfigModule here
+      imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
         url: `postgres://${configService.get(
@@ -66,11 +80,9 @@ import { AnalyticsModule } from './modules/analytics/analytics.module';
           process.env.NODE_ENV === 'development'
             ? 'DB_PASSWORD_LOCAL'
             : 'DB_PASSWORD_TEST',
-        )}@${configService.get(
-          'DB_HOST',
-        )}:${+configService.get<number>('DB_PORT')}/${configService.get(
-          'DB_NAME',
-        )}`,
+        )}@${configService.get('DB_HOST')}:${+configService.get<number>(
+          'DB_PORT',
+        )}/${configService.get('DB_NAME')}`,
         entities: [
           Profile,
           RMBStaffMember,

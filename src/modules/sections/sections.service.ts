@@ -104,11 +104,17 @@ export class SectionsService {
     });
   }
   async findSectionById(id: UUID) {
-    return await this.sectionRepository.findOne({
+    const section = await this.sectionRepository.findOne({
       where: {
         id: id,
       },
     });
+    if (!section) {
+      throw new NotFoundException(
+        'The section with the provided id is not found',
+      );
+    }
+    return section;
   }
 
   async getAllSections() {

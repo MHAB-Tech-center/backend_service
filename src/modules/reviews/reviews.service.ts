@@ -28,7 +28,7 @@ export class ReviewsService {
       throw new BadRequestException(
         'The review with the provided comment and inspection plan already esitsts',
       );
-    const review = new InspectionReview(comment, inspectionPlan);
+    const review  = new InspectionReview(comment, inspectionPlan);
     return await this.reviewRepository.save(review);
   }
 }
