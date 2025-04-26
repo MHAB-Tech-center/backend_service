@@ -5,7 +5,7 @@ import { Column, Entity } from 'typeorm';
 export class Section extends BaseEntity {
   @Column({ name: 'title', unique: true })
   title: string;
-  @Column({nullable:true})
+  @Column({ nullable: true })
   flagStandard: string;
 
   constructor(title: string, flagStandard: string) {

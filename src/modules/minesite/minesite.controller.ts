@@ -7,6 +7,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CustomExceptionFilter } from 'src/exceptions/CustomExceptionFilter';
 import { Public } from 'src/decorators/public.decorator';
 import { Roles } from 'src/utils/decorators/roles.decorator';
+import { ERole } from 'src/common/Enum/ERole.enum';
 
 @Controller('minesites')
 @ApiTags('minesites')
@@ -15,12 +16,12 @@ import { Roles } from 'src/utils/decorators/roles.decorator';
 export class MinesiteController {
   constructor(private minesiteService: MinesiteService) {}
   @Post('create')
-  @Roles('ADMIN')
+  @Roles(ERole.ADMIN)
   async create(@Body() dto: CreateMineSiteDTO): Promise<ApiResponse> {
     return this.minesiteService.create(dto);
   }
   @Post('update')
-  @Roles('ADMIN')
+  @Roles(ERole.ADMIN)
   async update(
     @Param('id') id: UUID,
     @Body() dto: CreateMineSiteDTO,
@@ -28,11 +29,24 @@ export class MinesiteController {
     return this.minesiteService.update(id, dto);
   }
   @Get('all')
-  @Public()
+  @Roles(
+    ERole.RMB,
+    ERole.ADMIN,
+    ERole.INSPECTOR,
+    ERole.ENVIRONOMIST,
+    ERole.MCIS,
+  )
   async getAll() {
     return this.minesiteService.getAll();
   }
   @Get('/:id')
+  @Roles(
+    ERole.RMB,
+    ERole.ADMIN,
+    ERole.INSPECTOR,
+    ERole.ENVIRONOMIST,
+    ERole.MCIS,
+  )
   async getById(@Param('id') id: UUID): Promise<any> {
     return this.minesiteService.getById(id);
   }

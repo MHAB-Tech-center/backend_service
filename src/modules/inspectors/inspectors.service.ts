@@ -87,6 +87,7 @@ export class InspectorsService {
       district,
     );
     const userProfile = await this.userService.getOneByEmail(email);
+
     inspector.profile = userProfile;
     inspector.minesite = minesite;
     inspector.email = userProfile.email.toString();

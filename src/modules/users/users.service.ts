@@ -158,18 +158,38 @@ export class UsersService {
       user: { ...this.user, rmbRole: rmbRole },
     });
   }
+
   async login(dto: LoginDTO) {
     await this.preLogin(dto);
     this.user.loginStatus = ELoginStatus[ELoginStatus.FOR_VERIFICATION];
-    this.user.activationCode = this.generateRandomFourDigitNumber();
+    // this.user.activationCode = this.generateRandomFourDigitNumber();
     await this.userRepo.save(this.user);
 
-    this.mailingService.sendEmail(
-      '',
-      'verify-email-login',
+    const tokens = this.utilsService.getTokens(this.user);
+
+    this.user.loginStatus = ELoginStatus[ELoginStatus.VERIFIED];
+    await this.userRepo.save(this.user);
+    const rmbMember = await this.rmbService.findByEmail(
       this.user.email.toString(),
-      this.user,
     );
+    let rmbRole = null;
+    if (rmbMember) {
+      rmbRole = rmbMember.rmbRole;
+    }
+    delete this.user.password;
+    delete this.user.activationCode;
+    return new ApiResponse(true, 'The login was verified successfully', {
+      access: (await tokens).accessToken,
+      refresh_token: (await tokens).refreshToken,
+      user: { ...this.user, rmbRole: rmbRole },
+    });
+
+    // this.mailingService.sendEmail(
+    //   '',
+    //   'verify-email-login',
+    //   this.user.email.toString(),
+    //   this.user,
+    // );
   }
 
   async verifyAccount(code: number) {
@@ -227,6 +247,7 @@ export class UsersService {
     await this.userRepo.save(account);
     this.mailingService.sendEmail('', 'get-code', email, account);
   }
+
   async createUser(body: CreateUserDto) {
     let { email, registercode } = body;
     if (registercode != process.env.ADMIN_KEY) {
@@ -237,7 +258,7 @@ export class UsersService {
 
     // let userGender = this.utilsService.getGender(gender);
     try {
-      const role = await this.roleService.getRoleByName(ERole[ERole.ADMIN]);
+      const role = await this.roleService.getRoleByName(body.role);
       const password = await this.utilsService.hashString(body.password);
       const userToCreate = new Profile(email, password);
       userToCreate.activationCode = this.generateRandomFourDigitNumber();

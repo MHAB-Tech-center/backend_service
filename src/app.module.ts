@@ -66,11 +66,9 @@ import { AnalyticsModule } from './modules/analytics/analytics.module';
           process.env.NODE_ENV === 'development'
             ? 'DB_PASSWORD_LOCAL'
             : 'DB_PASSWORD_TEST',
-        )}@${configService.get(
-          'DB_HOST',
-        )}:${+configService.get<number>('DB_PORT')}/${configService.get(
-          'DB_NAME',
-        )}`,
+        )}@${configService.get('DB_HOST')}:${+configService.get<number>(
+          'DB_PORT',
+        )}/${configService.get('DB_NAME')}`,
         entities: [
           Profile,
           RMBStaffMember,
@@ -131,9 +129,6 @@ export class AppModule implements OnModuleInit {
   constructor(private readonly roleService: RoleService) {}
 
   async onModuleInit() {
-    let roles = await this.roleService.getAllRoles();
-    if (!roles || roles.length == 0) {
-      this.roleService.createRoles();
-    }
+    this.roleService.createRoles();
   }
 }

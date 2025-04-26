@@ -24,18 +24,24 @@ export class RoleService {
     @Inject(forwardRef(() => UsersService))
     private userService: UsersService,
   ) {}
-  createRoles() {
+  async createRoles() {
+    let roles = await this.roleRepo.find({});
+
     const roleArray: Array<ERole> = [
       ERole.ADMIN,
       ERole.USER,
       ERole.INSPECTOR,
       ERole.RMB,
+      ERole.MCIS,
     ];
-    roleArray.forEach((role) => {
-      const roleEntity = this.roleRepo.create({
-        role_name: ERole[role],
-      });
-      this.roleRepo.save(roleEntity);
+    roleArray.forEach((roleName) => {
+      const registeredRoles = roles.map((role) => role.role_name);
+      if (!registeredRoles.includes(roleName)) {
+        const roleEntity = this.roleRepo.create({
+          role_name: ERole[roleName],
+        });
+        this.roleRepo.save(roleEntity);
+      }
     });
   }
 

@@ -87,7 +87,11 @@ export class AuthController {
   }
   @Get('/get-profile')
   @Public()
-  async getProfile(@Req() req: Request) : Promise<ApiResponse>{
-    return new ApiResponse(true, "The profile was retrieved successfully", await this.authService.getProfile(req))
+  async getProfile(@Req() req: Request): Promise<ApiResponse> {
+    return new ApiResponse(
+      true,
+      'The profile was retrieved successfully',
+      await this.authService.getProfile(req),
+    );
   }
 }

@@ -6,6 +6,7 @@ import { Request } from 'express';
 import { CustomExceptionFilter } from 'src/exceptions/CustomExceptionFilter';
 import { Public } from 'src/decorators/public.decorator';
 import { Roles } from 'src/utils/decorators/roles.decorator';
+import { ERole } from 'src/common/Enum/ERole.enum';
 
 @Controller('analytics')
 @ApiTags('analytics')
@@ -14,7 +15,7 @@ import { Roles } from 'src/utils/decorators/roles.decorator';
 export class AnalyticsController {
   constructor(private analyticsService: AnalyticsService) {}
   @Get('/inspector')
-  @Roles('RMB','ADMIN')
+  @Roles(ERole.RMB, ERole.ADMIN, ERole.INSPECTOR)
   @ApiOperation({
     description: 'This is or loggedIn inspectors only',
   })
@@ -27,7 +28,7 @@ export class AnalyticsController {
     );
   }
   @Get('rmb')
-  @Roles('RMB','ADMIN')
+  @Roles('RMB', 'ADMIN')
   async getAdminDashBoard(): Promise<ApiResponse> {
     return new ApiResponse(
       true,

@@ -7,6 +7,7 @@ import { Public } from 'src/decorators/public.decorator';
 import { UUID } from 'crypto';
 import { Roles } from 'src/utils/decorators/roles.decorator';
 import { ReportService } from './report.service';
+import { ERole } from 'src/common/Enum/ERole.enum';
 
 @Controller('reporting')
 @ApiTags('reporting')
@@ -16,8 +17,7 @@ export class ReportingController {
   constructor(private reportingService: ReportService) {}
 
   @Get('inspections/:planId')
-  @Public()
-  // @Roles('ADMIN','RMB')
+  @Roles(ERole.ADMIN, ERole.RMB, ERole.MCIS)
   async getInspectionsReport(
     @Res() response: Response,
     @Param('planId') planId: UUID,
@@ -30,12 +30,9 @@ export class ReportingController {
     );
   }
 
-  @Get('inspections/all')
-  @Public()
-  // @Roles('ADMIN','RMB')
-  async getAllInspectionsReport(
-    @Res() response: Response,
-  ) {
+  @Get('inspections')
+  @Roles(ERole.ADMIN, ERole.RMB, ERole.MCIS)
+  async getAllInspectionsReport(@Res() response: Response) {
     return new ApiResponse(
       true,
       'The file downloaded successfully',
