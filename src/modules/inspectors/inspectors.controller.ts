@@ -20,6 +20,7 @@ import { ApiResponse } from 'src/common/payload/ApiResponse';
 import { CustomExceptionFilter } from 'src/exceptions/CustomExceptionFilter';
 import { CreateInspectorDTO } from './dtos/createInspector.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ERole } from 'src/common/Enum/ERole.enum';
 
 @Controller('inspectors')
 @ApiTags('inspectors')
@@ -30,17 +31,20 @@ export class InspectorsController {
 
   // Get all inspector
   @Get('/all')
+  @Roles(ERole.RMB, ERole.ADMIN, ERole.MCIS)
   async getAll() {
     return this.inspectorService.getAll();
   }
 
   // Get inspector by email without relations
   @Get('/find-by-email/:email')
+  @Roles(ERole.RMB, ERole.ADMIN, ERole.MCIS)
   async getOneByEmail(@Param('email') email: string) {
     return await this.inspectorService.getByEmail(email);
   }
 
   // Create a new inspector
+
   @Post()
   @UseInterceptors(FileInterceptor('picture'))
   @ApiConsumes('multipart/form-data')
@@ -52,7 +56,7 @@ export class InspectorsController {
     return this.inspectorService.create(body, file);
   }
   @Post('invite')
-  // @Roles('ADMIN', 'RMB')
+  @Roles(ERole.ADMIN, ERole.RMB)
   @Public()
   async inviteInspector(@Body() dto: InviteUser): Promise<ApiResponse> {
     return this.inspectorService.inviteInspector(dto);
@@ -70,7 +74,7 @@ export class InspectorsController {
 
   // Get inspector by ID
   @Get('/by-id/:id')
-  @Roles('RMB','ADMIN')
+  @Roles(ERole.RMB, ERole.ADMIN, ERole.MCIS)
   async getById(@Param('id') id: UUID): Promise<ApiResponse> {
     return this.inspectorService.findById(id);
   }

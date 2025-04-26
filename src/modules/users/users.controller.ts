@@ -52,7 +52,7 @@ export class UsersController {
 
   @Public()
   @Post('/create')
-  @ApiOperation({ description:"Creates an admin"})
+  @ApiOperation({ description: 'Creates an admin' })
   @ApiBody({ type: CreateUserDto })
   createAdminAccount(@Body() body: CreateUserDto) {
     try {

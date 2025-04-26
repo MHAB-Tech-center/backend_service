@@ -17,6 +17,7 @@ import { Public } from 'src/decorators/public.decorator';
 import { UUID } from 'crypto';
 import { UpdateSectionFlagDTO } from 'src/common/dtos/sections/update-flag.dto';
 import { Roles } from 'src/utils/decorators/roles.decorator';
+import { ERole } from 'src/common/Enum/ERole.enum';
 
 @Controller('sections')
 @ApiTags('section')
@@ -26,13 +27,13 @@ export class SectionsController {
   constructor(private sectionService: SectionsService) {}
 
   @Post('create')
-  // @Roles('ADMIN')
+  @Roles(ERole.ADMIN)
   @Public()
   async create(@Body() dto: CreateSectionDTO): Promise<ApiResponse> {
     return this.sectionService.create(dto);
   }
   @Put('update/:id')
-  @Roles('ADMIN')
+  @Roles(ERole.ADMIN)
   async update(@Param('id') id: UUID, @Body() dto: CreateSectionDTO) {
     return new ApiResponse(
       true,
@@ -41,7 +42,7 @@ export class SectionsController {
     );
   }
   @Patch('change-flag/:id')
-  @Roles('ADMIN')
+  @Roles(ERole.ADMIN)
   async updateFlagStandard(
     @Param('id') id: UUID,
     @Body() dto: UpdateSectionFlagDTO,
@@ -57,10 +58,24 @@ export class SectionsController {
   }
 
   @Get('by-title/:title')
+  @Roles(
+    ERole.RMB,
+    ERole.ADMIN,
+    ERole.INSPECTOR,
+    ERole.ENVIRONOMIST,
+    ERole.MCIS,
+  )
   async getSectionByTitle(@Param('title') title: string): Promise<ApiResponse> {
     return this.sectionService.getSectionByTitle(title);
   }
   @Get('all')
+  @Roles(
+    ERole.RMB,
+    ERole.ADMIN,
+    ERole.INSPECTOR,
+    ERole.ENVIRONOMIST,
+    ERole.MCIS,
+  )
   async getAllSections() {
     return new ApiResponse(
       true,

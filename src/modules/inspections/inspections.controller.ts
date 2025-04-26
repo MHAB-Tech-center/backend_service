@@ -14,7 +14,7 @@ import { InspectionsService } from './inspections.service';
 import { ApiResponse } from 'src/common/payload/ApiResponse';
 import { CreateInspectionDTO } from 'src/common/dtos/inspections/create-inspection.dto';
 import { Request } from 'express';
-import { 
+import {
   ApiBearerAuth,
   ApiOperation,
   ApiQuery,
@@ -29,6 +29,7 @@ import { EditManyInspectionRecordsDTO } from 'src/common/dtos/inspections/edit-m
 import { ReviewInspectionPlanDTO } from 'src/common/dtos/inspections/review-inspection-plan.dto';
 import { EInspectionStatus } from 'src/common/Enum/EInspectionStatus.enum';
 import { Roles } from 'src/utils/decorators/roles.decorator';
+import { ERole } from 'src/common/Enum/ERole.enum';
 
 @Controller('inspections')
 @ApiTags('inspections')
@@ -38,7 +39,7 @@ export class InspectionsController {
   constructor(private inspectionsService: InspectionsService) {}
 
   @Post('inspection-records/create')
-  @Roles('SUPERVISOR','ENVIRONOMIST','INSPECTOR')
+  @Roles('SUPERVISOR', 'ENVIRONOMIST', 'INSPECTOR')
   async createInspectionRecords(
     @Body() dto: CreateInspectionDTO,
   ): Promise<ApiResponse> {
@@ -46,7 +47,7 @@ export class InspectionsController {
   }
   @Public()
   @Post('inspection-plan/create')
-  @Roles('SUPERVISOR','ENVIRONOMIST','INSPECTOR')
+  @Roles('SUPERVISOR', 'ENVIRONOMIST', 'INSPECTOR')
   async createInspectionPlan(
     @Body() dto: CreateInspectionPlanDTO,
     @Req() request: Request,
@@ -54,7 +55,7 @@ export class InspectionsController {
     return this.inspectionsService.createInspectionPlan(request, dto);
   }
   @Put('/records/update')
-  @Roles('SUPERVISOR','ENVIRONOMIST','INSPECTOR')
+  @Roles('SUPERVISOR', 'ENVIRONOMIST', 'INSPECTOR')
   async editInspectionRecord(@Body() dto: EditInspectionRecordDTO) {
     return new ApiResponse(
       true,
@@ -62,9 +63,9 @@ export class InspectionsController {
       await this.inspectionsService.editInspectionRecord(dto),
     );
   }
-  
+
   @Put('/records/update-bulk')
-  @Roles('SUPERVISOR','ENVIRONOMIST','INSPECTOR')
+  @Roles('SUPERVISOR', 'ENVIRONOMIST', 'INSPECTOR')
   async editManyInspectionRecords(@Body() dto: EditManyInspectionRecordsDTO) {
     return new ApiResponse(
       true,
@@ -72,14 +73,24 @@ export class InspectionsController {
       await this.inspectionsService.editManyInspectionRecords(dto),
     );
   }
-  @ApiQuery({name:"action", example:"APPROVE"})
+  @ApiQuery({ name: 'action', example: 'APPROVE' })
   @Patch('/reports/take-action')
-  async approveOrRejectInspectionPlan(@Query('action') action: string, @Param('planId') planId: UUID) : Promise<ApiResponse>{
-    return new ApiResponse(true, "The inspection plan was updated successfully", await this.inspectionsService.approveOrRejectInspectionPlan(action,planId))
+  async approveOrRejectInspectionPlan(
+    @Query('action') action: string,
+    @Param('planId') planId: UUID,
+  ): Promise<ApiResponse> {
+    return new ApiResponse(
+      true,
+      'The inspection plan was updated successfully',
+      await this.inspectionsService.approveOrRejectInspectionPlan(
+        action,
+        planId,
+      ),
+    );
   }
 
   @Put('review/')
-  @Roles('RMB','ADMIN')
+  @Roles('RMB', 'ADMIN')
   async reviewInspectionPlan(@Body() dto: ReviewInspectionPlanDTO) {
     return new ApiResponse(
       true,
@@ -87,6 +98,7 @@ export class InspectionsController {
       await this.inspectionsService.reviewInspectionPlan(dto),
     );
   }
+
   @Put('all/by-status')
   @ApiQuery({ name: 'status', required: true, example: 'submitted' })
   async getInspectionPlanByStatus(
@@ -156,7 +168,7 @@ export class InspectionsController {
     );
   }
   @Get('categories/loggedIn-inspector')
-  @Roles('SUPERVISOR','ENVIRONOMIST','INSPECTOR')
+  @Roles('SUPERVISOR', 'ENVIRONOMIST', 'INSPECTOR')
   @ApiOperation({
     summary: ' Get all inspection category records',
     description:
@@ -223,7 +235,7 @@ export class InspectionsController {
       'Retrieves all  inspection category records filtered by status that are associated to loggedIn inspector',
   })
   @Get('categories/loggedIn-inspector')
-  @Roles('SUPERVISOR','ENVIRONOMIST','INSPECTOR')
+  @Roles('SUPERVISOR', 'ENVIRONOMIST', 'INSPECTOR')
   async getMyCategoriesFilteredByStatus(
     @Query('planId') planId: UUID,
     @Req() request: Request,
@@ -239,14 +251,14 @@ export class InspectionsController {
   }
 
   @Get('records/category-id/:categoryId')
-  @Roles('RMB','ADMIN')
+  @Roles(ERole.RMB, ERole.ADMIN, ERole.MCIS)
   async getRecordsByCategory(
     @Param('categoryId') categoryId: UUID,
   ): Promise<ApiResponse> {
     return await this.inspectionsService.getRecordsByCategory(categoryId);
   }
   @Get('/plans/all')
-  @Roles('RMB','ADMIN')
+  @Roles(ERole.ADMIN, ERole.RMB, ERole.MCIS)
   @Public()
   async getAllInspectionPlans() {
     return new ApiResponse(
@@ -256,7 +268,7 @@ export class InspectionsController {
     );
   }
   @Get('/plans/all/paginated')
-  @Roles('RMB','ADMIN')
+  @Roles(ERole.RMB, ERole.ADMIN, ERole.MCIS)
   @Public()
   @ApiQuery({
     name: 'status',
@@ -310,7 +322,14 @@ export class InspectionsController {
     );
   }
   @Get('plan/:planId')
-  @Roles('INSPECTOR','SUPERVISOR','ENVIRONOMIST', 'RMB','ADMIN')
+  @Roles(
+    ERole.INSPECTOR,
+    ERole.SUPERVISOR,
+    ERole.ENVIRONOMIST,
+    ERole.RMB,
+    ERole.ADMIN,
+    ERole.MCIS,
+  )
   async getInspectionPlan(@Param('planId') planId: UUID): Promise<ApiResponse> {
     return new ApiResponse(
       true,
@@ -319,7 +338,7 @@ export class InspectionsController {
     );
   }
   @Get('plans/loggedIn-inspector')
-  @Roles('INSPECTOR','SUPERVISOR','ENVIRONOMIST')
+  @Roles('INSPECTOR', 'SUPERVISOR', 'ENVIRONOMIST')
   async getAllPlansFilteredByAllForLoggedInInspector(
     @Req() request: Request,
   ): Promise<ApiResponse> {
@@ -332,7 +351,7 @@ export class InspectionsController {
     );
   }
   @Get('plans/current-plan/by-loggedIn-inspector')
-  @Roles('INSPECTOR','SUPERVISOR','ENVIRONOMIST')
+  @Roles('INSPECTOR', 'SUPERVISOR', 'ENVIRONOMIST')
   async getCurrentPlanForLoggedInInspector(
     @Req() request: Request,
   ): Promise<ApiResponse> {

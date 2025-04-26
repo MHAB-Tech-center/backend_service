@@ -47,12 +47,16 @@ export class CreateUserDto {
   @ApiProperty()
   password: string;
 
+  @IsOptional()
+  @ApiProperty({ required: false })
+  role?: string;
+
   // @IsDate()
   // dob: Date;
 
   @IsString()
   @IsNotEmpty()
-  @ApiProperty({example :"+250793045245"})
+  @ApiProperty({ example: '+250793045245' })
   @IsPhoneNumber()
   phonenumber: string;
 
