@@ -18,6 +18,7 @@ import { EInspectionStatus } from 'src/common/Enum/EInspectionStatus.enum';
 export class InspectionPlan extends BaseEntity {
   @ManyToOne(() => MineSite)
   minesiteInfo: MineSite;
+
   @ManyToOne(() => Inspector)
   @JoinColumn({ name: 'inspector_id' })
   inspectorInfo: Inspector;
@@ -25,15 +26,20 @@ export class InspectionPlan extends BaseEntity {
   @OneToOne(() => InspectionIdentification)
   @JoinColumn({ name: 'identification_id' })
   identification: InspectionIdentification;
+
   @OneToOne(() => SummaryReport)
   @JoinColumn({ name: 'summary_id' })
   summaryReport: SummaryReport;
+
   @Column({ nullable: true })
   startDate: Date;
+
   @Column({ nullable: true })
   endDate: Date;
+
   @Column({ nullable: true })
   year: number;
+
   @Column({
     name: 'status',
     nullable: true,

@@ -1,19 +1,22 @@
-version: '3.8'
 services:
-  api:
+  core-service:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: ./Dockerfile
+    command: npm run start
+    env_file:
+      - ./.env
     environment:
-      DATABASE_URL: 'postgres://jgwvrova:dtM4wG2jPYKsczgI0Qr-ks3L-byZlz_h@trumpet.db.elephantsql.com/jgwvrova'
-      NODE_ENV: development
-      PORT: 3000
+      - DB_HOST=postgres #  this is useful since localhost is not accessible from the container
+      - DB_PORT=5432 # Use PostgreSQL's default internal port
+      - REDIS_URL=redis://:dXf9TMBjMLxUCfz6HG57@redis:6379/1
+      - RABBITMQ_URI=amqp://rabbitmq:5672
+    volumes:
+      - /usr/src/app/node_modules
+      - .:/usr/src/app
     ports:
-      - "8060:3000"
-    networks:
-      - kabstore-network
-
-networks:
-  kabstore-network:
-    driver: bridge
-
+      - '3000:3000'
+      - '50055:50055'
+volumes:
+  caddy_data:
+  caddy_config:

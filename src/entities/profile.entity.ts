@@ -61,6 +61,7 @@ export class Profile extends InitiatorAudit {
   @ManyToMany(() => Role)
   @JoinTable()
   roles: Role[];
+
   constructor(email: String, password: string) {
     super();
     this.email = email;
