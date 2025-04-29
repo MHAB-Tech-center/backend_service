@@ -1,0 +1,64 @@
+services:
+  postgres:
+    image: mirror.gcr.io/postgres:latest
+    container_name: postgres-db
+    restart: always
+    ports:
+      - '5434:5432'
+    env_file:
+      - database.env
+    volumes:
+      - shared-db-data:/var/lib/postgresql/data
+
+  notification-db:
+    image: mirror.gcr.io/postgres
+    container_name: notification-postgres-db
+    restart: always
+    ports:
+      - '5435:5432'
+    env_file:
+      - database.env
+    volumes:
+      - notification-db-data:/var/lib/postgresql/data
+  rabbitmq:
+    image: mirror.gcr.io/rabbitmq:4.0.8  # TODO: This version should be updated to the latest one once its bug free.
+    ports:
+      - '5672:5672'
+
+  redis:
+    container_name: redis
+    image: mirror.gcr.io/redis:latest
+    env_file:
+      - database.env
+    environment:
+      - REDIS_PASSWORD
+      - REDIS_PORT
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/root/redis
+    command: redis-server --requirepass "${REDIS_PASSWORD}"
+
+  minio:
+    image: mirror.gcr.io/minio/minio
+    command: server /data --console-address ":9001"
+    env_file:
+      - database.env
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    volumes:
+      - 'minio_data:/data'
+
+volumes:
+  shared-db-data:
+  redis_data:
+  clickhouse_data:
+  notification-db-data:
+  maria-db-data:
+  minio_data:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge
